@@ -1,0 +1,35 @@
+﻿@page "/"
+
+<PageTitle>Estudiante</PageTitle>
+
+
+<div class="card-header container shadow">
+    <div class="card-header">
+        <h1 class="text-primary fw-bold">"PROGRAMACI&Oacute;N APLICADA I"</h1>
+    </div>
+    <div class="mt-5">
+        <div class="row">
+            <div class="card-footer col-md-3 shadow bg-dark">
+                <img src="/css/pre.jpeg" alt="Imagen de perfil" class="img-fluid rounded-start" />
+            </div>
+            <div class="col-md-8">
+                <h1 class="fw-bold">@Nombre</h1>
+                <p><strong class="text-primary">Email:</strong> @Email</p>
+                <p><strong class="text-primary">Email Institucional:</strong> @EmailInstitucional</p>
+                <p><strong class="text-primary">Celular:</strong> @Celular</p>
+                <p><strong class="text-primary">Matrícula:</strong> @Matricula</p>
+                <p><strong class="text-primary">Intereses:</strong> @Intereses</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    string Nombre = "Delfry Paulino Ortega";
+    string Email = "delfrypaulino123@gmail.com";
+    string EmailInstitucional = "delfry_paulino@ucne.edu.do";
+    string Celular = "829-790-3950";
+    string Matricula = "(2021-0609)";
+    string Intereses = "Me apasiona la programación y la idea de seguir aprendiendo más de las nuevas tecnologías.";
+}

@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TareasToWASM.API", "TareasToWASM.API\TareasToWASM.API.csproj", "{AB9A4086-4FA0-4E35-884C-806806CC83D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TareasToWASM", "TareasToWASM\TareasToWASM.csproj", "{118B6FAB-E1CC-4710-AEEA-E7DF55767703}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{266C2989-DB30-4991-AEF2-9DBDC392ADA5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB9A4086-4FA0-4E35-884C-806806CC83D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB9A4086-4FA0-4E35-884C-806806CC83D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB9A4086-4FA0-4E35-884C-806806CC83D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB9A4086-4FA0-4E35-884C-806806CC83D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{118B6FAB-E1CC-4710-AEEA-E7DF55767703}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{118B6FAB-E1CC-4710-AEEA-E7DF55767703}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{118B6FAB-E1CC-4710-AEEA-E7DF55767703}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{118B6FAB-E1CC-4710-AEEA-E7DF55767703}.Release|Any CPU.Build.0 = Release|Any CPU
+		{266C2989-DB30-4991-AEF2-9DBDC392ADA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{266C2989-DB30-4991-AEF2-9DBDC392ADA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{266C2989-DB30-4991-AEF2-9DBDC392ADA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{266C2989-DB30-4991-AEF2-9DBDC392ADA5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
