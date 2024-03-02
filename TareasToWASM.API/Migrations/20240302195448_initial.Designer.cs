@@ -11,7 +11,7 @@ using TareasToWASM.API.DAL;
 namespace TareasToWASM.API.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20240302002042_initial")]
+    [Migration("20240302195448_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -149,7 +149,23 @@ namespace TareasToWASM.API.Migrations
 
                     b.HasKey("DetalleId");
 
+                    b.HasIndex("TicketId");
+
                     b.ToTable("TicketsDetalle");
+                });
+
+            modelBuilder.Entity("Shared.Models.TicketsDetalle", b =>
+                {
+                    b.HasOne("Shared.Models.Tickets", null)
+                        .WithMany("TicketsDetalle")
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Shared.Models.Tickets", b =>
+                {
+                    b.Navigation("TicketsDetalle");
                 });
 #pragma warning restore 612, 618
         }

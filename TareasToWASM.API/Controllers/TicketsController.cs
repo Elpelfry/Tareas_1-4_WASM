@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shared.Models;
 using TareasToWASM.API.DAL;
+using TareasToWASM.API.ViewModels.Request;
+using TareasToWASM.API.ViewModels.Response;
 
 namespace TareasToWASM.API.Controllers
 {
@@ -24,16 +26,37 @@ namespace TareasToWASM.API.Controllers
 
         // GET: api/Tickets
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Tickets>>> GetTickets()
+        public async Task<ActionResult<IEnumerable<TicketsResponse>>> GetTickets()
         {
-            return await _context.Tickets.
+            var tickets = await _context.Tickets.
                 Include(t => t.TicketsDetalle).
                     ToListAsync();
+
+            var ticketsR = tickets.Select(t => new TicketsResponse
+            {
+                TicketId = t.TicketId,
+                Fecha = t.Fecha,
+                ClienteId = t.ClienteId,
+                PrioridadId = t.PrioridadId,
+                SistemaId = t.SistemaId,
+                Solicitadopor = t.Solicitadopor,
+                Asunto = t.Asunto,
+                Descripcion = t.Descripcion,
+                TicketsDetalle = t.TicketsDetalle.Select(td => new TicketsDetalleResponse
+                {
+                    DetalleId = td.DetalleId,
+                    TicketId = td.TicketId,
+                    Emisor = td.Emisor,
+                    Mensaje = td.Mensaje
+                }).ToList()
+            }).ToList();
+
+            return ticketsR;
         }
 
         // GET: api/Tickets/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Tickets>> GetTickets(int id)
+        public async Task<ActionResult<TicketsResponse>> GetTickets(int id)
         {
             var tickets = await _context.Tickets.
                 Include(t => t.TicketsDetalle).
@@ -43,18 +66,49 @@ namespace TareasToWASM.API.Controllers
             {
                 return NotFound();
             }
+            var ticketsR = new TicketsResponse
+            {
+                TicketId = tickets.TicketId,
+                Fecha = tickets.Fecha,
+                ClienteId = tickets.ClienteId,
+                PrioridadId = tickets.PrioridadId,
+                SistemaId = tickets.SistemaId,
+                Solicitadopor = tickets.Solicitadopor,
+                Asunto = tickets.Asunto,
+                Descripcion = tickets.Descripcion,
+                TicketsDetalle = tickets.TicketsDetalle.Select(t => new TicketsDetalleResponse
+                {
+                    DetalleId = t.DetalleId,
+                    TicketId = t.TicketId,
+                    Emisor = t.Emisor,
+                    Mensaje = t.Mensaje
+                }).ToList()
+            };
 
-            return tickets;
+            return ticketsR;
         }
 
         // POST: api/Tickets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Tickets>> PostTickets(Tickets tickets)
+        public async Task<ActionResult<TicketsResponse>> PostTickets(TicketsRequest ticketsR)
         {
-            tickets.TicketId = 0;
-            foreach (var item in tickets.TicketsDetalle)
-                item.DetalleId = 0;
+            var tickets = new Tickets
+            {
+                TicketId = 0,
+                Fecha = ticketsR.Fecha,
+                ClienteId = ticketsR.ClienteId,
+                PrioridadId = ticketsR.PrioridadId,
+                SistemaId = ticketsR.SistemaId,
+                Solicitadopor = ticketsR.Solicitadopor,
+                Asunto = ticketsR.Asunto,
+                Descripcion = ticketsR.Descripcion,
+                TicketsDetalle = ticketsR.TicketsDetalle.Select(t => new TicketsDetalle
+                {
+                    Emisor = t.Emisor,
+                    Mensaje = t.Mensaje
+                }).ToList()
+            };
 
             _context.Tickets.Add(tickets);
             await _context.SaveChangesAsync();
@@ -65,12 +119,25 @@ namespace TareasToWASM.API.Controllers
         // PUT: api/Tickets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTickets(int id, Tickets tickets)
+        public async Task<IActionResult> PutTickets(int id, TicketsRequest ticketsR)
         {
-            if (id != tickets.TicketId)
+            var tickets = new Tickets
             {
-                return BadRequest();
-            }
+                TicketId = id,
+                Fecha = ticketsR.Fecha,
+                ClienteId = ticketsR.ClienteId,
+                PrioridadId = ticketsR.PrioridadId,
+                SistemaId = ticketsR.SistemaId,
+                Solicitadopor = ticketsR.Solicitadopor,
+                Asunto = ticketsR.Asunto,
+                Descripcion = ticketsR.Descripcion,
+                TicketsDetalle = ticketsR.TicketsDetalle.Select(t => new TicketsDetalle
+                {
+                    Emisor = t.Emisor,
+                    Mensaje = t.Mensaje
+                }).ToList() 
+            };
+            
             await _context.TicketsDetalle
                 .Where(t => t.TicketId == tickets.TicketId)
                     .ExecuteDeleteAsync();

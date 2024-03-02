@@ -146,7 +146,23 @@ namespace TareasToWASM.API.Migrations
 
                     b.HasKey("DetalleId");
 
+                    b.HasIndex("TicketId");
+
                     b.ToTable("TicketsDetalle");
+                });
+
+            modelBuilder.Entity("Shared.Models.TicketsDetalle", b =>
+                {
+                    b.HasOne("Shared.Models.Tickets", null)
+                        .WithMany("TicketsDetalle")
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Shared.Models.Tickets", b =>
+                {
+                    b.Navigation("TicketsDetalle");
                 });
 #pragma warning restore 612, 618
         }

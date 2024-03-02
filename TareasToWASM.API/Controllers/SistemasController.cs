@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shared.Models;
 using TareasToWASM.API.DAL;
+using TareasToWASM.API.ViewModels.Request;
+using TareasToWASM.API.ViewModels.Response;
 
 namespace TareasToWASM.API.Controllers
 {
@@ -23,14 +25,21 @@ namespace TareasToWASM.API.Controllers
 
         // GET: api/Sistemas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Sistemas>>> GetSistemas()
+        public async Task<ActionResult<IEnumerable<SistemasResponse>>> GetSistemas()
         {
-            return await _context.Sistemas.ToListAsync();
+            var sistemas = await _context.Sistemas.ToListAsync();
+            var sistemasR = sistemas.Select(s => new SistemasResponse
+            {
+                SistemaId = s.SistemaId,
+                NombreSistema = s.NombreSistema,
+                DescripcionSistema = s.DescripcionSistema
+            }).ToList();
+            return sistemasR;
         }
 
         // GET: api/Sistemas/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Sistemas>> GetSistemas(int id)
+        public async Task<ActionResult<SistemasResponse>> GetSistemas(int id)
         {
             var sistemas = await _context.Sistemas.FindAsync(id);
 
@@ -38,16 +47,28 @@ namespace TareasToWASM.API.Controllers
             {
                 return NotFound();
             }
+            var sistemasR = new SistemasResponse
+            {
+                SistemaId = sistemas.SistemaId,
+                NombreSistema = sistemas.NombreSistema,
+                DescripcionSistema = sistemas.DescripcionSistema
+            };
 
-            return sistemas;
+            return sistemasR;
         }
 
         // POST: api/Sistemas
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Sistemas>> PostSistemas(Sistemas sistemas)
+        public async Task<ActionResult<SistemasResponse>> PostSistemas(SistemasRequest sistemasR)
         {
-            sistemas.SistemaId = 0;
+            var sistemas = new Sistemas
+            {
+                SistemaId = 0,
+                NombreSistema = sistemasR.NombreSistema,
+                DescripcionSistema = sistemasR.DescripcionSistema
+            };
+
             _context.Sistemas.Add(sistemas);
             await _context.SaveChangesAsync();
 
@@ -56,12 +77,15 @@ namespace TareasToWASM.API.Controllers
         // PUT: api/Sistemas/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSistemas(int id, Sistemas sistemas)
+        public async Task<IActionResult> PutSistemas(int id, SistemasRequest sistemasR)
         {
-            if (id != sistemas.SistemaId)
+
+            var sistemas = new Sistemas
             {
-                return BadRequest();
-            }
+                SistemaId = id,
+                NombreSistema = sistemasR.NombreSistema,
+                DescripcionSistema = sistemasR.DescripcionSistema
+            };
 
             _context.Entry(sistemas).State = EntityState.Modified;
 

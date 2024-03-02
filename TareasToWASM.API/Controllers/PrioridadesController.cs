@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Models;
 using TareasToWASM.API.DAL;
+using TareasToWASM.API.ViewModels.Request;
+using TareasToWASM.API.ViewModels.Response;
 
 namespace TareasToWASM.API.Controllers
 {
@@ -18,14 +20,22 @@ namespace TareasToWASM.API.Controllers
 
         // GET: api/Prioridades
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Prioridades>>> GetPrioridades()
+        public async Task<ActionResult<IEnumerable<PrioridadesResponse>>> GetPrioridades()
         {
-            return await _context.Prioridades.ToListAsync();
+            var prioridades = await _context.Prioridades.ToListAsync();
+            var prioridadesR = prioridades.Select(p => new PrioridadesResponse
+            {
+                PrioridadId = p.PrioridadId,
+                Descripcion = p.Descripcion,
+                DiasCompromiso = p.DiasCompromiso
+            }).ToList();
+
+            return prioridadesR;
         }
 
         // GET: api/Prioridades/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Prioridades>> GetPrioridades(int id)
+        public async Task<ActionResult<PrioridadesResponse>> GetPrioridades(int id)
         {
             var prioridades = await _context.Prioridades.FindAsync(id);
 
@@ -34,14 +44,26 @@ namespace TareasToWASM.API.Controllers
                 return NotFound();
             }
 
-            return prioridades;
+            var prioridadesR = new PrioridadesResponse
+            {
+                PrioridadId = prioridades.PrioridadId,
+                Descripcion = prioridades.Descripcion,
+                DiasCompromiso = prioridades.DiasCompromiso
+            };
+            return prioridadesR;
         }
 
         // POST: api/Prioridades
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Prioridades>> PostPrioridades(Prioridades prioridades)
+        public async Task<ActionResult<PrioridadesResponse>> PostPrioridades(PrioridadesRequest prioridadesR)
         {
+            var prioridades = new Prioridades
+            {
+                PrioridadId = 0,
+                Descripcion = prioridadesR.Descripcion,
+                DiasCompromiso = prioridadesR.DiasCompromiso
+            };
             _context.Prioridades.Add(prioridades);
             await _context.SaveChangesAsync();
 
@@ -51,13 +73,14 @@ namespace TareasToWASM.API.Controllers
         // PUT: api/Prioridades/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPrioridades(int id, Prioridades prioridades)
+        public async Task<IActionResult> PutPrioridades(int id, PrioridadesRequest prioridadesR)
         {
-            if (id != prioridades.PrioridadId)
+            var prioridades = new Prioridades
             {
-                return BadRequest();
-            }
-
+                PrioridadId = id,
+                Descripcion = prioridadesR.Descripcion,
+                DiasCompromiso = prioridadesR.DiasCompromiso
+            };
             _context.Entry(prioridades).State = EntityState.Modified;
 
             try

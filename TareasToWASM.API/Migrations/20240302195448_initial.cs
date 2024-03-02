@@ -89,7 +89,18 @@ namespace TareasToWASM.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TicketsDetalle", x => x.DetalleId);
+                    table.ForeignKey(
+                        name: "FK_TicketsDetalle_Tickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "Tickets",
+                        principalColumn: "TicketId",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TicketsDetalle_TicketId",
+                table: "TicketsDetalle",
+                column: "TicketId");
         }
 
         /// <inheritdoc />
@@ -105,10 +116,10 @@ namespace TareasToWASM.API.Migrations
                 name: "Sistemas");
 
             migrationBuilder.DropTable(
-                name: "Tickets");
+                name: "TicketsDetalle");
 
             migrationBuilder.DropTable(
-                name: "TicketsDetalle");
+                name: "Tickets");
         }
     }
 }
