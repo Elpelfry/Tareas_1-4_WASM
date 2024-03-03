@@ -1,0 +1,56 @@
+﻿@page "/DetalleCliente";
+@page "/DetalleCliente/{ClienteId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Detalle Cliente</PageTitle>
+
+<div class="card shadow col-8">
+    <div class="card-header bg-primary">
+        <h1 class="text-light">Detalles Del Cliente</h1>
+    </div>
+    <div class="card-header">
+        <h4 class=" fw-bold">Detalles...</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <p><strong class="text-primary bi bi-key">-ID:</strong> @cliente.ClienteId</p>
+                <p><strong class="text-primary bi bi-person">-Nombres: </strong> @cliente.Nombre</p>
+                <p><strong class="text-primary bi bi-phone">-Tel&eacute;fono: </strong> @cliente.Telefono</p>
+                <p><strong class="text-primary bi bi-phone">-Celular: </strong> @cliente.Celular</p>
+                <p><strong class="text-primary bi bi-card-heading">-RNC: </strong> @cliente.RNC</p>
+                <p><strong class="text-primary bi bi-envelope">-Email: </strong> @cliente.Email</p>
+                <p><strong class="text-primary bi bi-card-text">-Direcci&oacute;n: </strong> @cliente.Direccion</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        <a href="/IndexClientes" class="btn btn-primary bi bi-house-door-fill mt-1 ms-auto">Volver</a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    [Parameter]
+    public string? Mensaje { get; set; }
+    public Clientes cliente { get; set; } = new Clientes();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ClienteId > 0)
+        {
+            cliente.ClienteId = ClienteId;
+            await Buscar();
+        }
+    }
+    public async Task Buscar()
+    {
+        var ticketEncontrado = await httpClient.GetFromJsonAsync<Clientes>($"Clientes/{cliente.ClienteId}");
+        if (ticketEncontrado != null)
+        {
+            cliente = ticketEncontrado;
+        }
+    }
+    
+}

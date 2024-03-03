@@ -1,0 +1,70 @@
+﻿@page "/EliminarCliente";
+@page "/EliminarCliente/{ClienteId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Eliminar Cliente</PageTitle>
+
+<div class="card shadow col-8">
+    <div class="card-header bg-primary">
+        <h1 class="text-light">Eliminar Cliente</h1>
+    </div>
+    <div class="card-header bg-dark">
+        <h4 class="text-warning fw-bold">@mensaje</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <p><strong class="text-primary bi bi-key">-ID:</strong> @cliente.ClienteId</p>
+                <p><strong class="text-primary bi bi-person">-Nombres: </strong> @cliente.Nombre</p>
+                <p><strong class="text-primary bi bi-phone">-Tel&eacute;fono: </strong> @cliente.Telefono</p>
+                <p><strong class="text-primary bi bi-phone">-Celular: </strong> @cliente.Celular</p>
+                <p><strong class="text-primary bi bi-card-heading">-RNC: </strong> @cliente.RNC</p>
+                <p><strong class="text-primary bi bi-envelope">-Email: </strong> @cliente.Email</p>
+                <p><strong class="text-primary bi bi-card-text">-Direcci&oacute;n: </strong> @cliente.Direccion</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end input-group">
+        <a href="/IndexClientes" class="btn btn-primary bi bi-house-door-fill ms-auto">Volver</a>
+        <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="Eliminar">Eliminar</button>
+    </div>
+</div>
+@code {
+
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes cliente = new Clientes();
+    public string? mensaje { get; set; } = "¿Estás seguro que deseas eliminar el Cliente?";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ClienteId > 0)
+        {
+            cliente.ClienteId = ClienteId;
+            await Buscar();
+        }
+    }
+
+    public async Task Buscar()
+    {
+        var ticketEncontrado = await httpClient.GetFromJsonAsync<Clientes>($"Clientes/{cliente.ClienteId}");
+        if (ticketEncontrado != null)
+        {
+            cliente = ticketEncontrado;
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        var eliminado = await httpClient.DeleteAsync($"Clientes/{cliente.ClienteId}");
+        if (eliminado.IsSuccessStatusCode)
+        {
+            mensaje = "Ticket eliminado correctamente";
+            cliente = new Clientes();
+        }
+        else
+        {
+            mensaje = "Error al eliminar el Ticket";
+        }
+    }
+}
