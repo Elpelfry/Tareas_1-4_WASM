@@ -8,15 +8,15 @@ public class TicketsRequest
     [Required(ErrorMessage = "El campo fecha es obligatorio")]
     public DateTime Fecha { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Selecciona una Prioridad")]
+    [Required(ErrorMessage = "Requerido")]
     [ForeignKey("Prioridades")]
     public int PrioridadId { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Selecciona un Cliente")]
+    [Required(ErrorMessage = "Requerido")]
     [ForeignKey("Clientes")]
     public int ClienteId { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Selecciona un Sistema")]
+    [Required(ErrorMessage = "Requerido")]
     [ForeignKey("Sistemas")]
     public int SistemaId { get; set; }
 
