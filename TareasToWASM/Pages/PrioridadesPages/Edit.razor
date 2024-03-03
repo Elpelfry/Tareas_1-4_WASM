@@ -1,0 +1,106 @@
+﻿@page "/EditPrioridad";
+@page "/EditPrioridad/{PrioridadId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Editar Prioridad</PageTitle>
+
+<EditForm Model="prioridad" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card col-8 shadow">
+        <div class="card-header bg-primary ">
+            <h1 class="text-light">Editar Prioridad</h1>
+        </div>
+        <div class="card-body">
+            <div class="col-4">
+                <label class="fw-bold bi bi-card-text"> Descripci&oacute;n</label>
+                <InputText @bind-Value="prioridad.Descripcion" @oninput="MensajeGuardar" class="form-control"></InputText>
+                <ValidationMessage For="@(() => prioridad.Descripcion)" />
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <label class="fw-bold bi bi-calendar2-day mt-1"> Dias Compromiso</label>
+                    <InputNumber @bind-Value="prioridad.DiasCompromiso" @oninput="MensajeGuardar" min="0" class="form-control"></InputNumber>
+                    <ValidationMessage For="@(() => prioridad.DiasCompromiso)" />
+                </div>
+
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="input-group">
+                    <a href="/IndexPrioridades" class="btn btn-primary bi bi-house-door-fill">Volver</a>
+                    <button type="submit" class="btn btn-success bi bi-floppy-fill">Guardar</button>
+                </div>
+                <div class="col col-3">
+                    @if (resultado == 1)
+                    {
+                        <p class="alert-success form-control m-1">@mensaje</p>
+                    }
+                    else if (resultado == 2)
+                    {
+                        <p class="alert-danger form-control m-1">@mensaje</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public int PrioridadId { get; set; }
+    public Prioridades prioridad = new Prioridades();
+    public string? mensaje { get; set; }
+    public int resultado { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PrioridadId > 0)
+        {
+            var prioridadEncontrada = await httpClient.GetFromJsonAsync<Prioridades>($"Prioridades/{PrioridadId}");
+            if (prioridadEncontrada != null)
+            {
+                prioridad = prioridadEncontrada;
+            }
+        }
+    }
+
+    public async Task Guardar()
+    {
+        if(await Validar())
+        {
+            resultado = 2;
+            mensaje = "Registro No Guardado Descripción Ya Existe";
+            return;
+        }
+
+        var guardado = await httpClient.PutAsJsonAsync($"Prioridades/{prioridad.PrioridadId}", prioridad);
+        if (guardado.IsSuccessStatusCode)
+        {
+            resultado = 1;
+            mensaje = "Registro Guardado";
+        }
+        else
+        {
+            resultado = 2;
+            mensaje = "Registro No Guardado";
+        }
+
+    }
+
+    public void MensajeGuardar()
+    {
+        resultado = 0;
+        mensaje = string.Empty;
+    }
+
+    public async Task<bool> Validar()
+    {
+        var prioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("Prioridades"))!;
+
+        return prioridades.Any(p => p.Descripcion!.ToLower() == prioridad.Descripcion!.ToLower() 
+                                    && p.PrioridadId != prioridad.PrioridadId);
+    }
+}

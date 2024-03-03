@@ -1,0 +1,111 @@
+﻿@page "/IndexPrioridades"
+@inject HttpClient httpClient
+
+<PageTitle>Prioridades Home</PageTitle>
+
+<div class="card shadow">
+    <div class="card-header bg-primary d-flex align-items-center justify-content-center">
+        <h1 class="text-light fw-bold">Prioridades</h1>
+    </div>
+    <div class="card-body">
+        <div class="row filter-input ">
+            <label class="fw-bold">Buscar por:</label>
+            <div class="col col-2">
+                <InputSelect @bind-Value="Opcion" class="form-select">
+                    <option value="1">Prioridad Id</option>
+                    <option value="2">Descripci&oacute;n</option>
+                </InputSelect>
+            </div>
+            @if (Opcion <= 0)
+            {
+                <div class="col-auto">
+                    <a href="/RPrioridades" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
+                </div>
+            }
+            <div class="col-auto">
+                @switch (Opcion)
+                {
+                    case 1:
+                        <div class="input-group">
+                            <InputNumber @bind-Value="prioridad.PrioridadId" class="form-control" min="0"></InputNumber>
+                            <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                        </div>
+                        break;
+                    case 2:
+                        <div class="input-group">
+                            <InputText @bind-Value="prioridad.Descripcion" class="form-control"></InputText>
+                            <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                        </div>
+                        break;
+                }
+
+            </div>
+            @if (Opcion > 0)
+            {
+                <div class="col-auto">
+                    <a href="/RPrioridades" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
+                </div>
+            }
+            <div class="col d-flex justify-content-end">
+                <a href="/IndexTickets" class="btn btn-primary bi bi-ticket-fill"> Tickets</a>
+            </div>
+        </div>
+    </div>
+    <div>
+        <table class="table table-light table-hover table-striped table-bordered ">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center">Descripci&oacute;n</th>
+                    <th scope="col" class="text-center">Dias Compromiso</th>
+                    <th scope="col" class="text-center">Editar</th>
+                    <th scope="col" class="text-center">Detalles</th>
+                    <th scope="col" class="text-center">Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ListaPrioridades)
+                {
+                    <tr>
+                        <td class="text-center">@item.Descripcion</td>
+                        <td class="text-center">@item.DiasCompromiso</td>
+                        <td class="text-center">
+                            <a href="EditPrioridad/@item.PrioridadId" class="btn btn-primary bi bi-pencil-square"></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="DetallePrioridad/@item.PrioridadId" class="btn btn-info bi bi-card-text"></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="EliminarPrioridad/@item.PrioridadId" class="btn btn-danger bi bi-trash-fill"></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="card-header text-white">
+            <p>Cantidad de Prioridades: @ListaPrioridades.Count</p>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public List<Prioridades> ListaPrioridades = new List<Prioridades>();
+    public Prioridades prioridad = new Prioridades();
+    public int Opcion { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("Prioridades"))!;
+    }
+    public async Task Buscar()
+    {
+        if (Opcion == 1 && prioridad.PrioridadId > 0)
+            ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("Prioridades"))!.Where(p => p.PrioridadId == prioridad.PrioridadId).ToList();
+
+        else if (Opcion == 2 && !string.IsNullOrEmpty(prioridad.Descripcion))
+            ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("Prioridades"))!.Where(p => p.Descripcion!.ToLower().Contains(prioridad.Descripcion.ToLower())).ToList();
+        else
+            ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("Prioridades"))!;
+    }
+}

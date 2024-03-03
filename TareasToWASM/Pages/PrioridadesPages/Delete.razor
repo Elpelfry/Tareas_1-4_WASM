@@ -1,0 +1,60 @@
+﻿@page "/EliminarPrioridad";
+@page "/EliminarPrioridad/{PrioridadId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Eliminar Prioridad</PageTitle>
+
+<div class="card shadow col-8">
+    <div class="card-header bg-primary">
+        <h1 class="text-light">Eliminar Prioridad</h1>
+    </div>
+    <div class="card-header bg-dark">
+        <h4 class="text-warning fw-bold">@mensaje</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <p><strong class="text-primary bi bi-key">-ID:</strong> @prioridad.PrioridadId</p>
+                <p><strong class="text-primary bi bi-card-text">-Descripci&oacute;n:</strong> @prioridad.Descripcion</p>
+                <p><strong class="text-primary bi bi-calendar2-day">-Dias Compromiso: </strong> @prioridad.DiasCompromiso</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end input-group">
+        <a href="/IndexPrioridades" class="btn btn-primary bi bi-house-door-fill ms-auto">Volver</a>
+        <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="Eliminar">Eliminar</button>
+    </div>
+</div>
+@code {
+
+    [Parameter]
+    public int PrioridadId { get; set; }
+    public Prioridades prioridad = new Prioridades();
+    public string? mensaje { get; set; } = "¿Éstas seguro que deseas eliminar la Prioridad?";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PrioridadId > 0)
+        {
+            var prioridadEncontrada = await httpClient.GetFromJsonAsync<Prioridades>($"Prioridades/{PrioridadId}");
+            if (prioridadEncontrada != null)
+            {
+                prioridad = prioridadEncontrada;
+            }
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        var eliminado = await httpClient.DeleteAsync($"Prioridades/{prioridad.PrioridadId}");
+        if (eliminado.IsSuccessStatusCode)
+        {
+            mensaje = "Prioridad eliminada correctamente";
+            prioridad = new Prioridades();
+        }
+        else
+        {
+            mensaje = "Error al eliminar la prioridad";
+        }
+    }
+}

@@ -1,0 +1,96 @@
+﻿@page "/RPrioridades";
+@inject HttpClient httpClient
+
+<PageTitle>Registro Prioridad</PageTitle>
+
+<EditForm Model="prioridad" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card shadow col-8">
+        <div class="card-header bg-primary">
+            <h1 class="text-light">Registro de Prioridades</h1>
+        </div>
+        <div class="card-body">
+            <div class="col-4">
+                <label class="fw-bold bi bi-card-text"> Descripci&oacute;n</label>
+                <InputText @bind-Value="prioridad.Descripcion" @oninput="MensajeGuardar" class="form-control" ></InputText>
+                <ValidationMessage For="@(() => prioridad.Descripcion)"/>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <label class="fw-bold bi bi-calendar2-day mt-1"> Dias Compromiso</label>
+                    <InputNumber @bind-Value="prioridad.DiasCompromiso" @oninput="MensajeGuardar" min="0" class="form-control"></InputNumber>
+                    <ValidationMessage For="@(() => prioridad.DiasCompromiso)" />
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="input-group">
+                    <a href="/IndexPrioridades" class="btn btn-primary bi bi-house-door-fill">Volver</a>
+                    <button type="button" class="btn btn-secondary bi bi-file-earmark-diff-fill" @onclick="Nuevo" @oninput="MensajeGuardar">Nuevo</button>
+                    <button type="submit" class="btn btn-success bi bi-floppy-fill">Guardar</button>
+                </div>
+                <div class="col col-3">
+                    @if (resultado == 1)
+                    {
+                        <p class="alert-success form-control m-1">@mensaje</p>
+                    }
+                    else if (resultado == 2)
+                    {
+                        <p class="alert-danger form-control m-1">@mensaje</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    public Prioridades prioridad = new Prioridades();
+    public string? mensaje { get; set; }
+    public int resultado { get; set; }
+
+    public void Nuevo()
+    {
+        prioridad = new Prioridades();
+        MensajeGuardar();
+    }
+
+    public async Task Guardar()
+    {
+        if (await Validar())
+        {
+            resultado = 2;
+            mensaje = "Registro No Guardado Descripción Ya Existe";
+            return;
+        }
+
+        var guardado = await httpClient.PostAsJsonAsync("Prioridades", prioridad);
+        if (guardado.IsSuccessStatusCode)
+        {
+            resultado = 1;
+            mensaje = "Registro Guardado";
+        }
+        else
+        {
+            resultado = 2;
+            mensaje = "Registro No Guardado";
+        }
+
+    }
+
+    public void MensajeGuardar()
+    {
+        resultado = 0;
+        mensaje = string.Empty;
+    }
+
+    public async Task<bool> Validar()
+    {
+        var prioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("Prioridades"))!;
+
+        return prioridades.Any(p => p.Descripcion!.ToLower() == prioridad.Descripcion!.ToLower()
+                                    && p.PrioridadId != prioridad.PrioridadId);
+    }
+}
