@@ -1,0 +1,126 @@
+﻿@page "/IndexTickets"
+@inject HttpClient httpClient
+
+<PageTitle>Tickets Home</PageTitle>
+
+<div class="card shadow">
+    <div class="card-header bg-primary d-flex align-items-center justify-content-center">
+        <h1 class="text-light fw-bold">Tickets</h1>
+    </div>
+    <div class="card-body">
+        <div class="row filter-input ">
+            <label class="fw-bold">Buscar por:</label>
+            <div class="col col-2">
+                <InputSelect @bind-Value="Opcion" class="form-select">
+                    <option value="1">TicketId</option>
+                    <option value="2">Asunto</option>
+                </InputSelect>
+            </div>
+            @if (Opcion <= 0)
+            {
+                <div class="col-auto">
+                    <a href="/RTicket" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
+                </div>
+            }
+            <div class="col-auto">
+                @switch (Opcion)
+                {
+                    case 1:
+                        <div class="input-group">
+                            <InputNumber @bind-Value="ticket.TicketId" class="form-control" min="0"></InputNumber>
+                            <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                        </div>
+                        break;
+                    case 2:
+                        <div class="input-group">
+                            <InputText @bind-Value="ticket.Asunto" class="form-control"></InputText>
+                            <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                        </div>
+                        break;
+                }
+            </div>
+            @if (Opcion > 0)
+            {
+                <div class="col-auto">
+                    <a href="/RTicket" class="btn btn-success bi bi-file-earmark-diff-fill">Crear</a>
+                </div>
+            }
+            <div class="col text-end">
+                <a href="/IndexClientes" class="btn btn-primary bi bi-card-text"> Clientes</a>
+                <a href="/IndexPrioridades" class="btn btn-primary bi bi-card-text "> Prioridades</a>
+                <a href="/IndexSistemas" class="btn btn-primary bi bi-card-text "> Sistemas</a>
+            </div>
+        </div>
+    </div>
+    <div>
+        <table class="table table-light table-hover table-striped table-bordered ">
+            <thead >
+                <tr>
+                    <th scope="col" class="text-center">Asunto</th>
+                    <th scope="col" class="text-center">Solicitado Por</th>
+                    <th scope="col" class="text-center">Fecha</th>
+                    <th scope="col" class="text-center">Cliente</th>
+                    <th scope="col" class="text-center">Prioridad</th>
+                    <th scope="col" class="text-center">Sistema</th>
+                    <th scope="col" class="text-center">Editar</th>
+                    <th scope="col" class="text-center">Detalles</th>
+                    <th scope="col" class="text-center">Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ListaTickets)
+                {
+                    <tr>
+                        <td class="text-center">@item.Asunto</td>
+                        <td class="text-center">@item.Solicitadopor</td>
+                        <td class="text-center">@item.Fecha.ToString("dd/MM/yyyy")</td>
+                        <td class="text-center">
+                            <a href="DCliente/@item.ClienteId" class="btn btn-outline-primary bi bi-eye-fill"></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="DPrioridad/@item.PrioridadId" class="btn btn-outline-primary bi bi-eye-fill"></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="DSistema/@item.SistemaId" class="btn btn-outline-primary bi bi-eye-fill"></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="EditTickets/@item.TicketId" class="btn btn-primary bi bi-pencil-square"></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="DetalleTickets/@item.TicketId" class="btn btn-info bi bi-card-text"></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="EliminarTickets/@item.TicketId" class="btn btn-danger bi bi-trash-fill"></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="card-footer fw-bold">
+            <p>Cantidad de Tickets: @ListaTickets.Count</p>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public List<Tickets> ListaTickets = new List<Tickets>();
+    public Tickets ticket = new Tickets();
+    public int Opcion { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaTickets = (await httpClient.GetFromJsonAsync<List<Tickets>>("Tickets"))!;
+    }
+    public async Task Buscar()
+    {
+        if (Opcion == 1 && ticket.TicketId > 0)
+            ListaTickets = (await httpClient.GetFromJsonAsync<List<Tickets>>("Tickets"))!.Where(t => t.TicketId == ticket.TicketId).ToList();
+
+        else if (Opcion == 2 && !string.IsNullOrEmpty(ticket.Asunto))
+            ListaTickets = (await httpClient.GetFromJsonAsync<List<Tickets>>("Tickets"))!.Where(t => t.Asunto!.ToLower().Contains(ticket.Asunto!.ToLower())).ToList();
+        else
+            ListaTickets = (await httpClient.GetFromJsonAsync<List<Tickets>>("Tickets"))!;
+    }
+}

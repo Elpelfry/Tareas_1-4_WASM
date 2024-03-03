@@ -1,0 +1,230 @@
+﻿@page "/RTicket";
+@inject HttpClient httpClient
+
+<PageTitle>Registro Tickets</PageTitle>
+
+<EditForm Model="ticket" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card shadow col-8">
+        <div class="card-header bg-primary">
+            <h1 class="text-light">Registro de Tickets</h1>
+        </div>
+        <div class="card-body bg-light">
+            <div class="row">
+                <div class="col col-3">
+                    <label class="fw-bold bi bi-key"> Prioridad:</label>
+                    <InputSelect @bind-Value="ticket.PrioridadId" class="form-select">
+                        @foreach (var prioridad in ListaPrioridades)
+                        {
+                            <option value="@prioridad.PrioridadId">@prioridad.Descripcion</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => ticket.PrioridadId)" />
+                </div>
+                <div class="col col-3">
+                    <label class="fw-bold bi bi-key"> Cliente:</label>
+                    <InputSelect @bind-Value="ticket.ClienteId" class="form-select">
+                        @foreach (var cliente in ListaClientes)
+                        {
+                            <option value="@cliente.ClienteId">@cliente.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => ticket.ClienteId)" />
+                </div>
+                <div class="col col-5">
+                    <label class="fw-bold bi bi-key"> Sistema:</label>
+                    <InputSelect @bind-Value="ticket.SistemaId" class="form-select">
+                        @foreach (var sistema in ListaSistemas)
+                        {
+                            <option value="@sistema.SistemaId">@sistema.NombreSistema</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => ticket.SistemaId)" />
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-4">
+                    <label class="fw-bold bi bi-calendar-date"> Fecha</label>
+                    <InputDate @bind-Value="ticket.Fecha" class="form-control"></InputDate>
+                    <ValidationMessage For="@(() => ticket.Fecha)" />
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-3">
+                    <label class="fw-bold bi bi-person-badge-fill"> Solicitado Por:</label>
+                    <InputText @bind-Value="ticket.Solicitadopor" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => ticket.Solicitadopor)" />
+                </div>
+                <div class="col-3">
+                    <label class="fw-bold bi bi-pencil-square"> Asunto:</label>
+                    <InputText @bind-Value="ticket.Asunto" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => ticket.Asunto)" />
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-6">
+                    <label class="fw-bold bi bi-card-text"> Descripci&oacute;n:</label>
+                    <InputText @bind-Value="ticket.Descripcion" class="form-control"></InputText>
+                    <ValidationMessage For="@(() => ticket.Descripcion)" />
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-primary">
+                <h3 class="text-light">Detalle Ticket</h3>
+            </div>
+            <div class="card-body row">
+                <div>
+                    <label class="bi bi-person-fill fw-bold"> Nombre</label>
+                    <InputText @bind-Value="Detalle.Emisor" class="form-control" placeholder="Enel R. Almonte."></InputText>
+                    <ValidationMessage For="@(() => Detalle.Emisor)" />
+                </div>
+                <div>
+                    <label class="bi bi-envelope-fill fw-bold"> Mensaje</label>
+                    <InputTextArea @bind-Value="Detalle.Mensaje" class="form-control" placeholder="Agregue un mensaje."></InputTextArea>
+                    <ValidationMessage For="@(() => Detalle.Mensaje)" />
+                </div>
+                <div class="mt-2">
+                    <button type="button" @onclick="Agregar" class="btn btn-success bi bi-plus-square justify-content-end col-3"> Agregar</button>
+                    <div class="col col-3">
+                        @if (resultado == 3)
+                        {
+                            <p class="alert-danger form-control m-1">@mensaje</p>
+                        }
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>Emisor</th>
+                        <th>Mensaje</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detalle in ticket.TicketsDetalle)
+                    {
+                        <tr>
+                            <td>@detalle.Emisor</td>
+                            <td>@detalle.Mensaje</td>
+                            <td><button type="button" class="btn btn-danger bi bi-trash-fill" @onclick=@(() => Remove(detalle))></button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer">
+            <div class="row">
+                <div class="input-group">
+                    <a href="/IndexTickets" class="btn btn-primary bi bi-house-door-fill">Volver</a>
+                    <button type="button" class="btn btn-secondary bi bi-file-earmark-diff-fill" @onclick="Nuevo" @oninput="MensajeGuardar">Nuevo</button>
+                    <button type="submit" class="btn btn-success bi bi-floppy-fill">Guardar</button>
+                </div>
+                <div class="col col-3">
+                    @if (resultado == 1)
+                    {
+                        <p class="alert-success form-control m-1">@mensaje</p>
+                    }
+                    else if (resultado == 2)
+                    {
+                        <p class="alert-danger form-control m-1">@mensaje</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    public Tickets ticket = new Tickets();
+    public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
+    public List<Prioridades> ListaPrioridades { get; set; } = new List<Prioridades>();
+    public List<Sistemas> ListaSistemas { get; set; } = new List<Sistemas>();
+    public TicketsDetalle Detalle { get; set; } = new TicketsDetalle();
+
+    public string? mensaje { get; set; }
+    public int resultado { get; set; }
+    public int Opcion { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaClientes = (await httpClient.GetFromJsonAsync<List<Clientes>>("Clientes"))!;
+        ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("Prioridades"))!;
+        ListaSistemas = (await httpClient.GetFromJsonAsync<List<Sistemas>>("Sistemas"))!;
+        ticket.Fecha = DateTime.Today;
+        Nuevo();
+    }
+
+
+    public async Task Guardar()
+    {
+        var guardadoTicket = await httpClient.PostAsJsonAsync("Tickets", ticket);
+
+        if (guardadoTicket.IsSuccessStatusCode)
+        {
+            resultado = 1;
+            mensaje = "Registro Guardado";
+            ticket = new Tickets();
+            ticket.Fecha = DateTime.Today;
+        }
+        else
+        {
+            resultado = 2;
+            mensaje = "Registro No Guardado";
+        }
+    }
+
+    public void Agregar()
+    {
+        if (!string.IsNullOrEmpty(Detalle.Emisor) && !string.IsNullOrEmpty(Detalle.Mensaje))
+        {
+            if (Validar())
+            {
+                resultado = 3;
+                mensaje = "Existe ese Emisor";
+            }
+            else
+            {
+                resultado = 0;
+                mensaje = "";
+                ticket.TicketsDetalle.Add(Detalle);
+                Detalle = new TicketsDetalle();
+            }
+        }
+        else
+        {
+            resultado = 3;
+            mensaje = "LLena todos los campos";
+        }
+    }
+
+    public void Remove(TicketsDetalle details)
+    {
+        Detalle = details;
+        ticket.TicketsDetalle.Remove(Detalle);
+    }
+
+    public void MensajeGuardar()
+    {
+        resultado = 0;
+        mensaje = string.Empty;
+    }
+
+    public void Nuevo()
+    {
+        ticket = new Tickets();
+        MensajeGuardar();
+        ticket.Fecha = DateTime.Today;
+    }
+
+    public bool Validar()
+    {
+        return ticket.TicketsDetalle.
+            Any(x => x.Emisor!.ToLower() == Detalle.Emisor!.ToLower());
+    }
+}

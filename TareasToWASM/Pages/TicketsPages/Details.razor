@@ -1,0 +1,69 @@
+﻿@page "/DetalleTickets";
+@page "/DetalleTickets/{TicketId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Detalle Ticket</PageTitle>
+
+<div class="card shadow col-8">
+    <div class="card-header bg-primary">
+        <h1 class="text-light">Detalles del Ticket</h1>
+    </div>
+    <div class="card-header">
+        <h4 class="fw-bold">Detalles...</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <p><strong class="text-primary bi bi-key">-TicketID:</strong> @ticket.TicketId</p>
+                <p><strong class="text-primary bi bi-key">-ID Cliente:</strong> @ticket.ClienteId</p>
+                <p><strong class="text-primary bi bi-key">-ID Prioridad:</strong> @ticket.PrioridadId</p>
+                <p><strong class="text-primary bi bi-key">-ID Sistema:</strong> @ticket.SistemaId</p>
+                <p><strong class="text-primary bi bi-calendar-date">-Fecha:</strong> @ticket.Fecha.ToString("dd/MM/yyyy")</p>
+                <p><strong class="text-primary bi bi-card-text">-Asunto:</strong> @ticket.Asunto</p>
+                <p><strong class="text-primary bi bi-person-badge-fill">-Solicitado Por:</strong> @ticket.Solicitadopor</p>
+                <p><strong class="text-primary bi bi-card-text">-Descripci&oacute;n:</strong> @ticket.Descripcion</p>
+            </div>
+        </div>
+        <table class="table table-bordered text-center">
+            <thead>
+                <tr>
+                    <th>TicketId</th>
+                    <th>Emisor</th>
+                    <th>Mensaje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detalle in ticket.TicketsDetalle)
+                {
+                    <tr>
+                        <td>@detalle.TicketId</td>
+                        <td>@detalle.Emisor</td>
+                        <td>@detalle.Mensaje</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer d-flex justify-content-end input-group">
+        <a href="/IndexTickets" class="btn btn-primary bi bi-house-door-fill ms-auto">Volver</a>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int TicketId { get; set; }
+    public Tickets ticket { get; set; } = new Tickets();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (TicketId > 0)
+        {
+            var ticketEncontrado = await httpClient.GetFromJsonAsync<Tickets>($"Tickets/{TicketId}");
+            if (ticketEncontrado != null)
+            {
+                ticket = ticketEncontrado;
+            }
+        }
+    }
+}

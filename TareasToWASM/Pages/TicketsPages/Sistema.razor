@@ -1,0 +1,45 @@
+﻿@page "/DSistema";
+@page "/DSistema/{SistemaId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Detalle Sistema</PageTitle>
+
+<div class="card shadow col-8">
+    <div class="card-header bg-primary">
+        <h1 class="text-light">Detalles Del Sistema</h1>
+    </div>
+    <div class="card-header">
+        <h4 class="fw-bold">Detalles...</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <p><strong class="text-primary bi bi-key">-ID:</strong> @sistema.SistemaId</p>
+                <p><strong class="text-primary bi bi-card-text">-Nombre:</strong> @sistema.NombreSistema</p>
+                <p><strong class="text-primary bi bi-card-text">-Descripci&oacute;n:</strong> @sistema.DescripcionSistema</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        <a href="/IndexTickets" class="btn btn-primary bi bi-house-door-fill mt-1 ms-auto">Volver</a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas sistema { get; set; } = new Sistemas();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SistemaId > 0)
+        {
+            var _sistema = await httpClient.GetFromJsonAsync<Sistemas>($"Sistemas/{SistemaId}");
+            if (_sistema != null)
+            {
+                sistema = _sistema;
+            }
+
+        }
+    }
+}

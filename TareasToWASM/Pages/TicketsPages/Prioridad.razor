@@ -1,0 +1,44 @@
+﻿@page "/DPrioridad";
+@page "/DPrioridad/{PrioridadId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Detalle Cliente</PageTitle>
+
+<div class="card shadow col-8">
+    <div class="card-header bg-primary">
+        <h1 class="text-light">Detalles De Prioridad</h1>
+    </div>
+    <div class="card-header">
+        <h4 class="fw-bold">Detalles...</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <p><strong class="text-primary bi bi-key">-ID:</strong> @prioridad.PrioridadId</p>
+                <p><strong class="text-primary bi bi-card-text">-Descripci&oacute;n:</strong> @prioridad.Descripcion</p>
+                <p><strong class="text-primary bi bi-calendar2-day">-Dias Compromiso: </strong> @prioridad.DiasCompromiso</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        <a href="/IndexTickets" class="btn btn-primary bi bi-house-door-fill mt-1 ms-auto">Volver</a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int PrioridadId { get; set; }
+    public Prioridades prioridad = new Prioridades();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PrioridadId > 0)
+        {
+            var response = await httpClient.GetFromJsonAsync<Prioridades>($"Prioridades/{PrioridadId}");
+            if(response != null)
+            {
+                prioridad = response;
+            }
+        }
+    }
+}
