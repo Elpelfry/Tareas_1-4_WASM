@@ -127,7 +127,7 @@
 
     private async Task<bool> VerificarExistenciaCliente()
     {
-        var clientesRegistrados = await httpClient.GetFromJsonAsync<List<Clientes>>("api/Clientes");
+        var clientesRegistrados = await httpClient.GetFromJsonAsync<List<Clientes>>("Clientes");
         return clientesRegistrados!.Any(c =>
         (c.Nombre!.ToLower().Replace(" ", "") == cliente.Nombre!.ToLower().Replace(" ", "")
         || c.RNC! == cliente.RNC!) && c.ClienteId != cliente.ClienteId);
