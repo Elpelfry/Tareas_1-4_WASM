@@ -1,0 +1,101 @@
+﻿@page "/EditSistema";
+@page "/EditSistema/{SistemaId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Editar Sistema</PageTitle>
+
+<EditForm Model="sistema" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card col-8 shadow">
+        <div class="card-header bg-primary">
+            <h1 class="text-light">Editar Sistema</h1>
+        </div>
+        <div class="card-body bg-light">
+            <div class="col-4">
+                <label class="fw-bold bi bi-card-text"> Nombre</label>
+                <InputText @bind-Value="sistema.NombreSistema" @oninput="MensajeGuardar" class="form-control"></InputText>
+                <ValidationMessage For="@(() => sistema.NombreSistema)" />
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="fw-bold bi bi-card-text mt-1"> Descripci&oacute;n</label>
+                </div>
+                <InputText @bind-Value="sistema.DescripcionSistema" @oninput="MensajeGuardar" class="form-control"></InputText>
+                <ValidationMessage For="@(() => sistema.DescripcionSistema)" />
+            </div>
+        </div>
+        <div class="card-footer row">
+            <div class="input-group">
+                <a href="/IndexSistemas" class="btn btn-primary bi bi-house-door-fill">Volver</a>
+                <button type="submit" class="btn btn-success bi bi-floppy-fill">Guardar</button>
+            </div>
+            <div class="col col-3">
+                @if (resultado == 1)
+                {
+                    <p class="alert-success form-control m-1">@mensaje</p>
+                }
+                else if (resultado == 2)
+                {
+                    <p class="alert-danger form-control m-1">@mensaje</p>
+                }
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas sistema = new Sistemas();
+    public string? mensaje { get; set; }
+    public int resultado { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SistemaId > 0)
+        {
+            var _sistema = await httpClient.GetFromJsonAsync<Sistemas>($"Sistemas/{SistemaId}");
+            if (_sistema != null)
+            {
+                sistema = _sistema;
+            }
+        }
+    }
+
+    public async Task Guardar()
+    {
+        if (await Validar())
+        {
+            resultado = 2;
+            mensaje = "El sistema ya existe";
+            return;
+        }
+
+        var response = await httpClient.PutAsJsonAsync($"Sistemas/{sistema.SistemaId}", sistema);
+        if (response.IsSuccessStatusCode)
+        {
+            resultado = 1;
+            mensaje = "Cambios Guardados";
+        }
+        else
+        {
+            resultado = 2;
+            mensaje = "Registro No Guardado";
+        }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var sistemas = (await httpClient.GetFromJsonAsync<List<Sistemas>>("Sistemas"))!;
+
+        return sistemas.Any(s => s.NombreSistema == sistema.NombreSistema && sistema.SistemaId != s.SistemaId);
+    }
+
+    public void MensajeGuardar()
+    {
+        resultado = 0;
+        mensaje = string.Empty;
+    }
+}

@@ -1,0 +1,60 @@
+﻿@page "/EliminarSistema";
+@page "/EliminarSistema/{SistemaId:int}";
+@inject HttpClient httpClient
+
+<PageTitle>Eliminar Sistema</PageTitle>
+
+<div class="card shadow col-8">
+    <div class="card-header bg-primary">
+        <h1 class="text-light">Eliminar Sistema</h1>
+    </div>
+    <div class="card-header bg-dark">
+        <h4 class="text-warning fw-bold">@mensaje</h4>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <p><strong class="text-primary bi bi-key">-ID:</strong> @sistema.SistemaId</p>
+                <p><strong class="text-primary bi bi-card-text">-Nombre:</strong> @sistema.NombreSistema</p>
+                <p><strong class="text-primary bi bi-card-text">-Descripci&oacute;n:</strong> @sistema.DescripcionSistema</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end input-group">
+        <a href="/IndexSistemas" class="btn btn-primary bi bi-house-door-fill ms-auto">Volver</a>
+        <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="Eliminar">Eliminar</button>
+    </div>
+</div>
+@code {
+
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas sistema { get; set; } = new Sistemas();
+    public string? mensaje { get; set; } = "¿Éstas seguro que deseas eliminar el Sistema?";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SistemaId > 0)
+        {
+            var _sistema = await httpClient.GetFromJsonAsync<Sistemas>($"Sistemas/{SistemaId}");
+            if (_sistema != null)
+            {
+                sistema = _sistema;
+            }
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        var eliminado = await httpClient.DeleteAsync($"Sistemas/{sistema.SistemaId}");
+        if (eliminado.IsSuccessStatusCode)
+        {
+            mensaje = "Sistema eliminado correctamente";
+            sistema = new Sistemas();
+        }
+        else
+        {
+            mensaje = "Error al eliminar el sistema";
+        }
+    }
+}
