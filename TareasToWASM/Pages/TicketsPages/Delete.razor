@@ -31,7 +31,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var detalle in ListaDetalles)
+                @foreach (var detalle in ticket.TicketsDetalle)
                 {
                     <tr>
                         <td>@detalle.TicketId</td>
@@ -52,7 +52,6 @@
     [Parameter]
     public int TicketId { get; set; }
     public Tickets ticket { get; set; } = new Tickets();
-    public List<TicketsDetalle> ListaDetalles = new List<TicketsDetalle>();
     public string? mensaje { get; set; } = "¿Estás seguro que deseas eliminar el Ticket?";
 
     protected override async Task OnInitializedAsync()

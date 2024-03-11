@@ -96,6 +96,7 @@ namespace TareasToWASM.API.Controllers
         {
             var clientes = new Clientes
             {
+                ClienteId = id,
                 Nombre = clientesR.Nombre,
                 Telefono = clientesR.Telefono,
                 Celular = clientesR.Celular,
